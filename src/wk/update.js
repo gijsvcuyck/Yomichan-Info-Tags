@@ -48,8 +48,13 @@ async function updateWKItems() {
         path.resolve(__dirname, "./last_update.txt"),
         "utf8",
     );
+    console.log(`Last update was at ${last_update}`);
     for (let item of items) {
-        if (item.data_updated_at > last_update) break;
+        if (item.data_updated_at > last_update) {
+            console.log(`Update required. Last update of ${item} was at ${item.data_updated_at}`);
+            break;
+        }
+        console.log(`No further update required`);
         return;
     }
 
