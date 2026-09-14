@@ -24,12 +24,24 @@ async function getItems() {
     let url = "https://api.wanikani.com/v2/subjects?page_after_id=0";
     while (url) {
         console.log(`Fetching ${url}`);
-        let data = await axios.get(url, config);
+        let data = await fetchWithRetry(url);
         items = items.concat(data.data.data);
         url = data.data.pages.next_url;
         await wait(1000);
     }
     return items;
+}
+
+async function fetchWithRetry(url, retries = 3) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            return await axios.get(url, config);
+        } catch (err) {
+            if (attempt === retries) throw err;
+            console.log(`Fetch failed (attempt ${attempt}): ${err.code || err.message}. Retrying...`);
+            await wait(5000 * attempt);
+        }
+    }
 }
 
 async function updateWKItems() {
