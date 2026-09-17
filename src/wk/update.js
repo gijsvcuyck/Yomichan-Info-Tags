@@ -104,6 +104,9 @@ function write_update(items){
     // Only publish new version of dictionary if there are actual changes.
     if (dataChanged) {
         update_revision(revision);
+        console.log(`New level changes detected. Publishing new revision.`);
+    } else {
+        console.log(`No content changes to levels found. Stopping update.`);
     }
     return dataChanged;
 }
