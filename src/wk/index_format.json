@@ -1,0 +1,12 @@
+{
+    "title": "WK",
+    "format": 3,
+    "revision": "__REVISION__",
+    "author": "Gijs",
+    "attribution": "Originally created by Kumirei, modified by Gijs",
+    "isUpdatable": true,
+    "indexUrl": "https://github.com/gijsvcuyck/Yomichan-Info-Tags/raw/master/src/wk/index.json",
+    "downloadUrl": "https://github.com/gijsvcuyck/Yomichan-Info-Tags/raw/master/dicts/yomichan_wk_level_tags.zip",
+    "url": "https://github.com/gijsvcuyck/Yomichan-Info-Tags",
+    "description": "Contains wanikani level for words and kanji as a yomitan frequency dictionary."
+}

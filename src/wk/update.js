@@ -60,13 +60,24 @@ async function updateWKItems() {
         // }
         if (item.data_updated_at > last_update && item.object != "radical") {
             console.log(`Update required. Last update of ${item.object}: ${item.data.characters} was at ${item.data_updated_at}`);
-            write_update(items);
-            return true;
+            return write_update(items);
         }
     }
     console.log(`No further update required`);
     return false;
    
+}
+
+function writeIfChanged(filePath, newContent, handler) {
+    let oldContent = null;
+    oldContent = fs.readFileSync(filePath, "utf-8");
+
+    if (oldContent === newContent) {
+        return false;
+    }
+
+    fs.writeFileSync(filePath, newContent, "utf-8", handler);
+    return true;
 }
 
 function write_update(items){
@@ -79,14 +90,30 @@ function write_update(items){
     let kanjiText = `[\n${kanji.join(",\n")}\n]`;
     let vocabText = `[\n${vocab.join(",\n")}\n]`;
     const errorHandler = (err) => (err ? console.error(err) : undefined);
-    fs.writeFile(`${__dirname}/kanji.json`, kanjiText, "utf-8", errorHandler);
-    fs.writeFile(`${__dirname}/vocab.json`, vocabText, "utf-8", errorHandler);
+
+    const kanjiChanged = writeIfChanged(`${__dirname}/kanji.json`, kanjiText, errorHandler);
+    const vocabChanged = writeIfChanged(`${__dirname}/vocab.json`, vocabText, errorHandler);
+    const dataChanged = kanjiChanged || vocabChanged;
+    const revision = new Date().toISOString();
     fs.writeFile(
         `${__dirname}/last_update.txt`,
-        new Date().toISOString(),
+        revision,
         "utf-8",
         errorHandler,
     );
+    // Only publish new version of dictionary if there are actual changes.
+    if (dataChanged) {
+        update_revision(revision);
+    }
+    return dataChanged;
+}
+
+function update_revision(revision) {
+  const template = fs.readFileSync(`${__dirname}/index_format.json`, 'utf8');
+  const filled = template.replace('"__REVISION__"', JSON.stringify(revision));
+  // Sanity check: make sure the result is valid JSON before writing it out
+  const parsed = JSON.parse(filled);
+  fs.writeFileSync(`${__dirname}/index.json`, filled, 'utf8');
 }
 
 function zip() {
